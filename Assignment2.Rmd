@@ -1,0 +1,128 @@
+---
+title: "Assessment 2"
+author: "Karthik Revi s4644246"
+date: "03/28/2022"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### Part 1
+
+*Karthik Revi*
+## ID-s4644246 
+<hr> 
+
+# Assignment 2
+
+<hr>
+### Part 2
+
+```{r}
+install.packages("randomForest")
+library(tidyverse)
+library(skimr)
+
+
+DATASET <-read.csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2018/2018-11-20/thanksgiving_meals.csv")
+```
+### Question1
+```{r}
+knitr::kable(head(DATASET[,1:12],10))
+```
+
+
+
+### Question2
+```{r}
+dataset_new<-skim(DATASET)
+
+```
+### Question3
+```{r}
+family_income<-fct_reorder(DATASET$family_income, DATASET$family_income, min)
+```
+
+
+
+### Question 4
+```{r}
+nrow(subset(DATASET, celebrate=='Yes'))
+```
+### Question5
+```{r}
+knitr::kable(DATASET %>% group_by(main_dish) %>%  count(main_prep) %>% arrange(desc(n)) %>% head(n=10))
+```
+### Question6
+```{r}
+DATASET %>% ggplot() +  aes(x = main_dish, fill = main_dish) +   geom_bar() + labs(x = "Main Dish", y = "Count", title = "Main dish served method", subtitle = "Main Dish", caption = "main dish served method",  fill = "Legend")
+```
+<p>The most servered dish is Turkey clearly visible from the graph extracted using ggplot command</p>
+<br>
+### Question7
+```{r}
+nrow(subset(DATASET, cranberry=='Canned' | cranberry=='Homemade'))
+nrow(subset(DATASET, gravy=='Yes'))
+```
+
+### Question 8 and 9
+```{r}
+knitr::kable(DATASET %>% group_by(celebrate) %>%  count(family_income) %>% arrange(desc(n)) %>% head(n=10))
+```
+```{r}
+DATASET %>% ggplot() +  aes(x = celebrate, fill =family_income) +   geom_bar() + labs(x = "celebrate", y = "Count", title = "Distribution celebrate Income ranges", subtitle = "Celebrate", caption = "Distribution celebrate with income ranges",  fill = "Legend")
+```
+<p>The graph generated using ggplot command is showing that people irrespective of the income are celebrating</p>
+<br>
+### Question10
+```{r}
+dataset_new1<-DATASET %>% select(id, starts_with("side"),
+         starts_with("pie"),
+         starts_with("dessert")) %>%
+  select(-side15, -pie13, -dessert12) %>%
+  gather(type, value, -id) %>%
+  filter(!is.na(value),
+         !value %in% c("None", "Other (please specify)")) %>%
+  mutate(type = str_remove(type, "\\d+"))
+print(dataset_new1)
+```
+<p>The whole set of code lines extract three fields having value started with specific word</p>
+<br>
+
+### Question11 and 12
+```{r}
+library(widyr)
+```
+<p>The useful results are extrated from the query. The highest corrlation value is between Cookies and Brownies. The lowest correlation between the Mashed potatoes and Pumpkin</p>
+<br>
+```{r}
+dataset_new1 %>% pairwise_cor(value, id, sort = TRUE)
+```
+<p>The useful results are extrated from the query. The highest corrlation value is between Cookies and Brownies. The lowest correlation between the Mashed potatoes and Pumpkin</p>
+<br>
+ 
+### Question 13
+
+```{r}
+dataset_new <- do.call(data.frame, lapply(dataset_new, function(x) {
+  replace(x, is.infinite(x) | is.na(x) | is.nan(x), 0)
+  })
+)
+datavalues <- lm(t(dataset_new[3])~t(dataset_new[4]),data =head(dataset_new,10))
+summary(datavalues)
+
+datavalues <- lm(t(dataset_new[5])~t(dataset_new[4]),data =head(dataset_new,10))
+summary(datavalues)
+
+
+datavalues <- lm(t(dataset_new[4])~t(dataset_new[3]),data =head(dataset_new,10))
+summary(datavalues)
+```
+<p>The linear regression model is developed between different fields. All the fields are specifying the relation with regression model. The linear equation for prediction can also be evaluated</p>
+
+<p> The selected model is having higher productivity and lower error rate.</p>
+
+
+
